@@ -22,17 +22,17 @@ func main() {
 
 }
 
-func parseFile(filename string) error {
+func parseFile(filename string) ([]byte, error) {
 
 	f, err := os.Open(filename)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer f.Close()
 
 	fStats, err := f.Stat()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	fSize := fStats.Size()
@@ -44,10 +44,11 @@ func parseFile(filename string) error {
 	for idx := range pieceNum {
 		_, err := f.Read(buffer)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		hash := sha1.Sum(buffer)
-		return nil
+		copy(pieces[idx*int64(20):idx*int64(20)+20], hash[:])
 	}
 
+	return pieces, nil
 }
